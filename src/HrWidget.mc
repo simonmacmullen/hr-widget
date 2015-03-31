@@ -16,8 +16,8 @@ class HrWidget extends Ui.View {
 
     //! Restore the state of the app and prepare the view to be shown
     function onShow() {
-	Sensor.setEnabledSensors( [Sensor.SENSOR_HEARTRATE] );
-	Sensor.enableSensorEvents( method(:onSensor) );
+        Sensor.setEnabledSensors( [Sensor.SENSOR_HEARTRATE] );
+        Sensor.enableSensorEvents( method(:onSensor) );
     }
 
     //! Update the view
@@ -26,21 +26,21 @@ class HrWidget extends Ui.View {
         dc.clear();
         text(dc, 0.5, 0.05, Graphics.FONT_MEDIUM, "HR");
         text(dc, 0.5, 0.3,  Graphics.FONT_NUMBER_HOT, str(current));
-	text(dc, 0.3, 0.65, Graphics.FONT_NUMBER_MEDIUM, str(min));
+        text(dc, 0.3, 0.65, Graphics.FONT_NUMBER_MEDIUM, str(min));
         text(dc, 0.7, 0.65, Graphics.FONT_NUMBER_MEDIUM, str(max));
 
-	text(dc, 0.3, 0.8,  Graphics.FONT_TINY, "Min");
+        text(dc, 0.3, 0.8,  Graphics.FONT_TINY, "Min");
         text(dc, 0.7, 0.8,  Graphics.FONT_TINY, "Max");
     }
 
     function text(dc, x, y, font, s) {
         dc.drawText(dc.getWidth() * x, dc.getHeight() * y,
-		    font, s,
-		    Graphics.TEXT_JUSTIFY_CENTER|Graphics.TEXT_JUSTIFY_VCENTER);
+                    font, s,
+                    Graphics.TEXT_JUSTIFY_CENTER|Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
     function str(num) {
-	return num == null ? "---" : "" + num;
+        return num == null ? "---" : "" + num;
     }
 
     //! Called when this View is removed from the screen. Save the
@@ -49,15 +49,15 @@ class HrWidget extends Ui.View {
     }
 
     function onSensor(sensorInfo) {
-	current = sensorInfo.heartRate;
-	if (current != null) {
-	    if (min == null || min > current) {
-		min = current;
-	    }
-	    if (max == null || max < current) {
-		max = current;
-	    }
-	}
+        current = sensorInfo.heartRate;
+        if (current != null) {
+            if (min == null || min > current) {
+                min = current;
+            }
+            if (max == null || max < current) {
+                max = current;
+            }
+        }
         Ui.requestUpdate();
     }
 }
@@ -70,7 +70,7 @@ class HrWidgetApp extends App.AppBase {
     }
 
     function getInitialView() {
-	System.println("start");
+        System.println("start");
         return [new HrWidget()];
     }
 }
