@@ -2,7 +2,7 @@
     <iq:application entry="HrWidgetApp" id="2d23285fabc44e258d65c39e8255f5a0" launcherIcon="LauncherIcon" name="AppName" type="widget">
 
         <iq:products>
-            <iq:product id="round_watch"/>
+            <iq:product id="fenix3"/>
         </iq:products>
 
         <iq:permissions>
