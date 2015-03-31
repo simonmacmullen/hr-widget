@@ -1,5 +1,5 @@
 <iq:manifest xmlns:iq="http://www.garmin.com/xml/connectiq" version="1">
-    <iq:application entry="HrWidgetApp" id="2d23285fabc44e258d65c39e8255f5a0" name="AppName" type="widget">
+    <iq:application entry="HrWidgetApp" id="2d23285fabc44e258d65c39e8255f5a0" launcherIcon="LauncherIcon" name="AppName" type="widget">
 
         <iq:products>
             <iq:product id="round_watch"/>
