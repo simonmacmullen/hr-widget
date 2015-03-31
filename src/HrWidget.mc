@@ -24,13 +24,15 @@ class HrWidget extends Ui.View {
     function onUpdate(dc) {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         dc.clear();
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         text(dc, 0.5, 0.05, Graphics.FONT_MEDIUM, "HR");
-        text(dc, 0.5, 0.3,  Graphics.FONT_NUMBER_HOT, str(current));
-        text(dc, 0.3, 0.65, Graphics.FONT_NUMBER_MEDIUM, str(min));
-        text(dc, 0.7, 0.65, Graphics.FONT_NUMBER_MEDIUM, str(max));
+        text(dc, 0.5, 0.35, Graphics.FONT_NUMBER_THAI_HOT, str(current));
+        text(dc, 0.3, 0.7, Graphics.FONT_NUMBER_MEDIUM, str(min));
+        text(dc, 0.7, 0.7, Graphics.FONT_NUMBER_MEDIUM, str(max));
 
-        text(dc, 0.3, 0.8,  Graphics.FONT_TINY, "Min");
-        text(dc, 0.7, 0.8,  Graphics.FONT_TINY, "Max");
+        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
+        text(dc, 0.3, 0.85, Graphics.FONT_TINY, "Min");
+        text(dc, 0.7, 0.85, Graphics.FONT_TINY, "Max");
     }
 
     function text(dc, x, y, font, s) {
