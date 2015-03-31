@@ -72,7 +72,6 @@ class HrWidgetApp extends App.AppBase {
     }
 
     function getInitialView() {
-        System.println("start");
         return [new HrWidget()];
     }
 }
