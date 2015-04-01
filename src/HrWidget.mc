@@ -3,12 +3,12 @@
 using Toybox.Application as App;
 using Toybox.Graphics;
 using Toybox.Sensor as Sensor;
+using Toybox.System as System;
 using Toybox.WatchUi as Ui;
 
 class HrWidget extends Ui.View {
     var current = null;
-    var max = null;
-    var min = null;
+    var values = new [60];
 
     //! Load your resources here
     function onLayout(dc) {
@@ -25,20 +25,95 @@ class HrWidget extends Ui.View {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         dc.clear();
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        text(dc, 0.5, 0.05, Graphics.FONT_MEDIUM, "HR");
-        text(dc, 0.5, 0.35, Graphics.FONT_NUMBER_THAI_HOT, str(current));
-        text(dc, 0.3, 0.7, Graphics.FONT_NUMBER_MEDIUM, str(min));
-        text(dc, 0.7, 0.7, Graphics.FONT_NUMBER_MEDIUM, str(max));
+        text(dc, 109, 15, Graphics.FONT_MEDIUM, "HR");
+        text(dc, 109, 55, Graphics.FONT_NUMBER_MEDIUM, str(current));
 
-        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        text(dc, 0.3, 0.85, Graphics.FONT_TINY, "Min");
-        text(dc, 0.7, 0.85, Graphics.FONT_TINY, "Max");
+        chart(dc, 23, 85, 195, 172, 200, values);
     }
 
     function text(dc, x, y, font, s) {
-        dc.drawText(dc.getWidth() * x, dc.getHeight() * y,
-                    font, s,
+        dc.drawText(x, y, font, s,
                     Graphics.TEXT_JUSTIFY_CENTER|Graphics.TEXT_JUSTIFY_VCENTER);
+    }
+
+    function chart(dc, x1, y1, x2, y2, data_range_max, data) {
+        var width = x2 - x1;
+        var height = y2 - y1;
+        var x = x1;
+        var x_next;
+        var item;
+
+        var min = 999999;
+        var max = 0;
+        var min_x = 0;
+        var min_y = 0;
+        var max_x = 0;
+        var max_y = 0;
+
+        for (var i = 0; i < data.size(); i++) {
+            item = data[i];
+            x_next = x1 + (i + 1) * width / data.size();
+            if (item != null) {
+                var y = y2 - height * item / data_range_max;
+                dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
+                dc.fillRectangle(x, y, x_next - x, y2 - y);
+                dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+                dc.drawLine(x, y, x_next, y);
+                
+                if (item < min) {
+                    min = item;
+                    min_x = x;
+                    min_y = y;
+                }
+                
+                if (item > max) {
+                    max = item;
+                    max_x = x;
+                    max_y = y;
+                }
+            }
+            x = x_next;
+        }
+        if (max != 0 and min != max) {
+            label_text(dc, x1, y1, x2, y2, min_x, min_y, "" + min, false);
+            label_text(dc, x1, y1, x2, y2, max_x, max_y, "" + max, true);
+        }
+
+        tick_line(dc, x1, y1, y2, -5, true);
+        tick_line(dc, x2, y1, y2, 5, true);
+        tick_line(dc, y2, x1, x2 + 1, 5, false);
+    }
+
+    function label_text(dc, x1, y1, x2, y2, x, y, txt, above) {
+        var dims = dc.getTextDimensions(txt, Graphics.FONT_XTINY);
+        var w = dims[0];
+        x -= w / 2;
+        if (x < x1 + 2) {
+            x = x1 + 2;
+        } else if (x > x2 - w - 2) {
+            x = x2 - w - 2;
+        }
+        if (above) {
+            var h = dims[1];
+            y -= h;
+        }
+        dc.drawText(x, y, Graphics.FONT_XTINY, txt, Graphics.TEXT_JUSTIFY_LEFT);
+    }
+
+    function tick_line(dc, c, end1, end2, tick_size, vert) {
+        tick_line0(dc, c, end1, end2, vert);
+        for (var n = 1; n <= 3; n++) {
+            tick_line0(dc, ((4 - n) * end1 + n * end2) / 4, c, c + tick_size,
+                       !vert);
+        }
+    }
+
+    function tick_line0(dc, c, end1, end2, vert) {
+        if (vert) {
+            dc.drawLine(c, end1, c, end2);
+        } else {
+            dc.drawLine(end1, c, end2, c);
+        }
     }
 
     function str(num) {
@@ -52,14 +127,10 @@ class HrWidget extends Ui.View {
 
     function onSensor(sensorInfo) {
         current = sensorInfo.heartRate;
-        if (current != null) {
-            if (min == null || min > current) {
-                min = current;
-            }
-            if (max == null || max < current) {
-                max = current;
-            }
+        for (var i = 1; i < values.size(); i++) {
+            values[i-1] = values[i];
         }
+        values[values.size() - 1] = current;
         Ui.requestUpdate();
     }
 }
