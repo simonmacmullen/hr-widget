@@ -47,9 +47,10 @@ class HrWidget extends Ui.View {
         // TODO this is maybe just a tiny bit too ad-hoc
         if (dc.getWidth() == 218 && dc.getHeight() == 218) {
             // Fenix 3
-            text(dc, 109, 15, Graphics.FONT_MEDIUM, "HR");
-            text(dc, 109, 55, Graphics.FONT_NUMBER_MEDIUM, str(current));
-            chart(dc, 23, 85, 195, 172, 200, values);
+            text(dc, 109, 15, Graphics.FONT_TINY, "HEART");
+            text(dc, 109, 45, Graphics.FONT_NUMBER_MEDIUM, str(current));
+            chart(dc, 23, 75, 195, 172, 200, values);
+            text(dc, 109, 192, Graphics.FONT_XTINY, "2 MINUTES");
         } else if (dc.getWidth() == 205 && dc.getHeight() == 148) {
             // Vivoactive, FR920xt, Epix
             text(dc, 70, 25, Graphics.FONT_MEDIUM, "HR");
