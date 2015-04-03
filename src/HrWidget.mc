@@ -14,7 +14,7 @@ enum
 
 class HrWidget extends Ui.View {
     var current = null;
-    var values = new [60];
+    var values = new [120];
 
     //! Load your resources here
     function onLayout(dc) {
