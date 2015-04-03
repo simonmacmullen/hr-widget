@@ -43,10 +43,19 @@ class HrWidget extends Ui.View {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         dc.clear();
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        text(dc, 109, 15, Graphics.FONT_MEDIUM, "HR");
-        text(dc, 109, 55, Graphics.FONT_NUMBER_MEDIUM, str(current));
 
-        chart(dc, 23, 85, 195, 172, 200, values);
+        // TODO this is maybe just a tiny bit too ad-hoc
+        if (dc.getWidth() == 218 && dc.getHeight() == 218) {
+            // Fenix 3
+            text(dc, 109, 15, Graphics.FONT_MEDIUM, "HR");
+            text(dc, 109, 55, Graphics.FONT_NUMBER_MEDIUM, str(current));
+            chart(dc, 23, 85, 195, 172, 200, values);
+        } else if (dc.getWidth() == 205 && dc.getHeight() == 148) {
+            // Vivoactive, FR920xt, Epix
+            text(dc, 70, 25, Graphics.FONT_MEDIUM, "HR");
+            text(dc, 120, 25, Graphics.FONT_NUMBER_MEDIUM, str(current));
+            chart(dc, 10, 45, 195, 140, 200, values);
+        }
     }
 
     function text(dc, x, y, font, s) {
