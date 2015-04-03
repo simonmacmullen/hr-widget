@@ -6,6 +6,12 @@ using Toybox.Sensor as Sensor;
 using Toybox.System as System;
 using Toybox.WatchUi as Ui;
 
+enum
+{
+    LAST_VALUES,
+    LAST_VALUE_TIME
+}
+
 class HrWidget extends Ui.View {
     var current = null;
     var values = new [60];
@@ -18,6 +24,18 @@ class HrWidget extends Ui.View {
     function onShow() {
         Sensor.setEnabledSensors( [Sensor.SENSOR_HEARTRATE] );
         Sensor.enableSensorEvents( method(:onSensor) );
+
+        var app = App.getApp();
+        var old_values = app.getProperty(LAST_VALUES);
+        var old_time = app.getProperty(LAST_VALUE_TIME);
+        if (old_values != null && old_time != null) {
+            var delta = (System.getTimer() - old_time) / 1000;
+            if (delta > 0) { // Ignore old data from before reboot
+                for (var i = 0; i < values.size() - delta; i++) {
+                    values[i] = old_values[i + delta];
+                }
+            }
+        }
     }
 
     //! Update the view
@@ -123,6 +141,9 @@ class HrWidget extends Ui.View {
     //! Called when this View is removed from the screen. Save the
     //! state of your app here.
     function onHide() {
+        var app = App.getApp();
+        app.setProperty(LAST_VALUES, values);
+        app.setProperty(LAST_VALUE_TIME, System.getTimer());
     }
 
     function onSensor(sensorInfo) {
