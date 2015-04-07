@@ -49,13 +49,13 @@ class HrWidget extends Ui.View {
             // Fenix 3
             text(dc, 109, 15, Graphics.FONT_TINY, "HEART");
             text(dc, 109, 45, Graphics.FONT_NUMBER_MEDIUM, str(current));
-            chart(dc, 23, 75, 195, 172, 200, values);
+            chart(dc, 23, 75, 195, 172, values);
             text(dc, 109, 192, Graphics.FONT_XTINY, "2 MINUTES");
         } else if (dc.getWidth() == 205 && dc.getHeight() == 148) {
             // Vivoactive, FR920xt, Epix
             text(dc, 70, 25, Graphics.FONT_MEDIUM, "HR");
             text(dc, 120, 25, Graphics.FONT_NUMBER_MEDIUM, str(current));
-            chart(dc, 10, 45, 195, 140, 200, values);
+            chart(dc, 10, 45, 195, 140, values);
         }
     }
 
@@ -64,7 +64,9 @@ class HrWidget extends Ui.View {
                     Graphics.TEXT_JUSTIFY_CENTER|Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
-    function chart(dc, x1, y1, x2, y2, data_range_max, data) {
+    function chart(dc, x1, y1, x2, y2, data) {
+        var range_unit = 20; // y range will be multiples of this
+
         var width = x2 - x1;
         var height = y2 - y1;
         var x = x1;
@@ -73,38 +75,47 @@ class HrWidget extends Ui.View {
 
         var min = 999999;
         var max = 0;
-        var min_x = 0;
-        var min_y = 0;
-        var max_x = 0;
-        var max_y = 0;
+        var min_i = 0;
+        var max_i = 0;
 
         for (var i = 0; i < data.size(); i++) {
             item = data[i];
-            x_next = x1 + (i + 1) * width / data.size();
             if (item != null) {
-                var y = y2 - height * item / data_range_max;
+                if (item < min) {
+                    min_i = i;
+                    min = item;
+                }
+                
+                if (item > max) {
+                    max_i = i;
+                    max = item;
+                }
+            }
+        }
+
+        var range_min = round_down(min, range_unit);
+        var range_max = round_down(max, range_unit) + range_unit;
+
+        for (var i = 0; i < data.size(); i++) {
+            item = data[i];
+            x_next = item_x(i + 1, x1, width, data.size());
+            if (item != null) {
+                var y = item_y(item, y2, height, range_min, range_max);
                 dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
                 dc.fillRectangle(x, y, x_next - x, y2 - y);
                 dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
                 dc.drawLine(x, y, x_next, y);
-                
-                if (item < min) {
-                    min = item;
-                    min_x = x;
-                    min_y = y;
-                }
-                
-                if (item > max) {
-                    max = item;
-                    max_x = x;
-                    max_y = y;
-                }
             }
             x = x_next;
         }
+
         if (max != 0 and min != max) {
-            label_text(dc, x1, y1, x2, y2, min_x, min_y, "" + min, false);
-            label_text(dc, x1, y1, x2, y2, max_x, max_y, "" + max, true);
+            label_text(dc, item_x(min_i, x1, width, data.size()),
+                       item_y(min, y2, height, range_min, range_max),
+                       x1, y1, x2, y2, "" + min, false);
+            label_text(dc, item_x(max_i, x1, width, data.size()),
+                       item_y(max, y2, height, range_min, range_max),
+                       x1, y1, x2, y2, "" + max, true);
         }
 
         tick_line(dc, x1, y1, y2, -5, true);
@@ -112,7 +123,19 @@ class HrWidget extends Ui.View {
         tick_line(dc, y2, x1, x2 + 1, 5, false);
     }
 
-    function label_text(dc, x1, y1, x2, y2, x, y, txt, above) {
+    function round_down(n, mult) {
+        return (n / mult) * mult;
+    }
+
+    function item_x(i, orig_x, width, size) {
+        return orig_x + i * width / size;
+    }
+
+    function item_y(item, orig_y, height, min, max) {
+        return orig_y - height * (item - min) / (max - min);
+    }
+
+    function label_text(dc, x, y, x1, y1, x2, y2, txt, above) {
         var dims = dc.getTextDimensions(txt, Graphics.FONT_XTINY);
         var w = dims[0];
         x -= w / 2;
