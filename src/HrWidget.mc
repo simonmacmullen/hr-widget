@@ -12,9 +12,28 @@ enum
     LAST_VALUE_TIME
 }
 
+var widget;
+
 class HrWidget extends Ui.View {
     var current = null;
-    var values = new [120];
+    var values;
+
+    function initialize(a_values) {
+        values = a_values;
+    }
+
+    function set_range(range) {
+        var size;
+        var new_values = new [range];
+        var delta = range - values.size();
+        for (var i = 0; i < values.size(); i++) {
+            var new_i = i + delta;
+            if (new_i >= 0 && new_i < new_values.size()) {
+                new_values[new_i] = values[i];
+            }
+        }
+        values = new_values;
+    }
 
     //! Load your resources here
     function onLayout(dc) {
@@ -24,18 +43,6 @@ class HrWidget extends Ui.View {
     function onShow() {
         Sensor.setEnabledSensors( [Sensor.SENSOR_HEARTRATE] );
         Sensor.enableSensorEvents( method(:onSensor) );
-
-        var app = App.getApp();
-        var old_values = app.getProperty(LAST_VALUES);
-        var old_time = app.getProperty(LAST_VALUE_TIME);
-        if (old_values != null && old_time != null) {
-            var delta = (System.getTimer() - old_time) / 1000;
-            if (delta > 0) { // Ignore old data from before reboot
-                for (var i = 0; i < values.size() - delta; i++) {
-                    values[i] = old_values[i + delta];
-                }
-            }
-        }
     }
 
     //! Update the view
@@ -44,18 +51,21 @@ class HrWidget extends Ui.View {
         dc.clear();
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
 
+        var minutes_label = (values.size() / 60) + " MINUTES";
+
         // TODO this is maybe just a tiny bit too ad-hoc
         if (dc.getWidth() == 218 && dc.getHeight() == 218) {
             // Fenix 3
             text(dc, 109, 15, Graphics.FONT_TINY, "HEART");
             text(dc, 109, 45, Graphics.FONT_NUMBER_MEDIUM, str(current));
             chart(dc, 23, 75, 195, 172, values);
-            text(dc, 109, 192, Graphics.FONT_XTINY, "2 MINUTES");
+            text(dc, 109, 192, Graphics.FONT_XTINY, minutes_label);
         } else if (dc.getWidth() == 205 && dc.getHeight() == 148) {
             // Vivoactive, FR920xt, Epix
             text(dc, 70, 25, Graphics.FONT_MEDIUM, "HR");
             text(dc, 120, 25, Graphics.FONT_NUMBER_MEDIUM, str(current));
-            chart(dc, 10, 45, 195, 140, values);
+            chart(dc, 10, 45, 195, 120, values);
+            text(dc, 102, 135, Graphics.FONT_XTINY, minutes_label);
         }
     }
 
@@ -189,6 +199,48 @@ class HrWidget extends Ui.View {
     }
 }
 
+class HrWidgetDelegate extends Ui.InputDelegate {
+    function onKey(evt) {
+        if (evt.getKey() == Ui.KEY_ENTER) {
+            Ui.pushView(new Rez.Menus.MainMenu(), new MenuDelegate(),
+                        Ui.SLIDE_LEFT);
+            return true;
+        }
+        return false;
+    } 
+}
+
+class MenuDelegate extends Ui.MenuInputDelegate {
+    function onMenuItem(item) {
+        if (item == :set_period) {
+            Ui.pushView(new Rez.Menus.PeriodMenu(), new PeriodMenuDelegate(),
+                        Ui.SLIDE_LEFT);
+            return true;
+        }
+        Ui.popView(Ui.SLIDE_RIGHT);
+        return true;
+    } 
+}
+
+class PeriodMenuDelegate extends Ui.MenuInputDelegate {
+    function onMenuItem(item) {
+        if (item == :min_2) {
+            widget.set_range(120);
+        }
+        else if (item == :min_5) {
+            widget.set_range(300);
+        }
+        else if (item == :min_10) {
+            widget.set_range(600);
+        }
+        else if (item == :min_15) {
+            widget.set_range(900);
+        }
+        Ui.popView(Ui.SLIDE_RIGHT);
+        return true;
+    } 
+}
+
 class HrWidgetApp extends App.AppBase {
     function onStart() {
     }
@@ -197,6 +249,24 @@ class HrWidgetApp extends App.AppBase {
     }
 
     function getInitialView() {
-        return [new HrWidget()];
+        var app = App.getApp();
+        var old_values = app.getProperty(LAST_VALUES);
+        var old_time = app.getProperty(LAST_VALUE_TIME);
+        var values;
+        if (old_values != null && old_time != null) {
+            values = new[old_values.size()];
+            var delta = (System.getTimer() - old_time) / 1000;
+            if (delta > 0) { // Ignore old data from before reboot
+                for (var i = 0; i < values.size() - delta; i++) {
+                    values[i] = old_values[i + delta];
+                }
+            }
+        }
+        else {
+            values = new [120];
+        }
+
+        widget = new HrWidget(values);
+        return [widget, new HrWidgetDelegate()];
     }
 }
