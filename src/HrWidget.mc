@@ -75,7 +75,8 @@ class HrWidget extends Ui.View {
     }
 
     function chart(dc, x1, y1, x2, y2, data) {
-        var range_unit = 20; // y range will be multiples of this
+        var range_border = 5;
+        var range_min_size = 30;
 
         var width = x2 - x1;
         var height = y2 - y1;
@@ -103,8 +104,11 @@ class HrWidget extends Ui.View {
             }
         }
 
-        var range_min = round_down(min, range_unit);
-        var range_max = round_down(max, range_unit) + range_unit;
+        var range_min = min - range_border;
+        var range_max = max + range_border;
+        if (range_max - range_min < range_min_size) {
+            range_max = range_min + range_min_size;
+        }
 
         for (var i = 0; i < data.size(); i++) {
             item = data[i];
@@ -131,10 +135,6 @@ class HrWidget extends Ui.View {
         tick_line(dc, x1, y1, y2, -5, true);
         tick_line(dc, x2, y1, y2, 5, true);
         tick_line(dc, y2, x1, x2 + 1, 5, false);
-    }
-
-    function round_down(n, mult) {
-        return (n / mult) * mult;
     }
 
     function item_x(i, orig_x, width, size) {
