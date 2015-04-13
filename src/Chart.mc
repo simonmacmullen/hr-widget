@@ -48,6 +48,9 @@ class Chart {
                 if (x_old != null) {
                     dc.setColor(line_color, Graphics.COLOR_TRANSPARENT);
                     dc.drawLine(x_old, y_old, x, y);
+                    // TODO is the below line needed due to a CIQ bug
+                    // or some subtlety I don't understand?
+                    dc.drawPoint(x, y);
                 }
                 x_old = x;
                 y_old = y;
