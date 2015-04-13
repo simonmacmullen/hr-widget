@@ -5,4 +5,4 @@ DEVICE=$1
 killall simulator || true
 connectiq
 ./build.sh $DEVICE
-monkeydo bin/HrWidget.prg $DEVICE
+monkeydo bin/hr-widget.prg $DEVICE
