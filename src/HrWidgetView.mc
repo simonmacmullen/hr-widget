@@ -104,12 +104,6 @@ class HrWidgetView extends Ui.View {
         }
     }
 
-    function is_round_watch(dc) {
-        // TODO this is maybe just a tiny bit too ad-hoc
-        // square = 205x148
-        return dc.getWidth() == 218 && dc.getHeight() == 218;
-    }
-
     function text(dc, x, y, font, s) {
         dc.drawText(x, y, font, s,
                     Graphics.TEXT_JUSTIFY_CENTER|Graphics.TEXT_JUSTIFY_VCENTER);
