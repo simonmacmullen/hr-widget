@@ -21,10 +21,9 @@ class HrWidgetView extends Ui.View {
     var range_mult_count = 0;
     var chart;
 
-    function set_range(range) {
-        var new_range_mult = (range * 60) / values_size;
-        if (new_range_mult != range_mult) {
-            range_mult = new_range_mult;
+    function set_mult(new_mult) {
+        if (new_mult != range_mult) {
+            range_mult = new_mult;
             values = new [values_size];
         }
     }
@@ -47,7 +46,7 @@ class HrWidgetView extends Ui.View {
                 range_mult = old_range_mult;
             }
             else {
-                range_mult = 2;
+                range_mult = 1;
             }
 
             var old_values = app.getProperty(LAST_VALUES);
@@ -159,23 +158,26 @@ class MenuDelegate extends Ui.MenuInputDelegate {
 
 class PeriodMenuDelegate extends Ui.MenuInputDelegate {
     function onMenuItem(item) {
-        if (item == :min_5) {
-            widget.set_range(5);
+        if (item == :min_2) {
+            widget.set_mult(1);
+        }
+        else if (item == :min_5) {
+            widget.set_mult(2);
         }
         else if (item == :min_10) {
-            widget.set_range(10);
+            widget.set_mult(4);
         }
         else if (item == :min_15) {
-            widget.set_range(15);
+            widget.set_mult(6);
         }
         else if (item == :min_30) {
-            widget.set_range(30);
+            widget.set_mult(12);
         }
         else if (item == :min_45) {
-            widget.set_range(45);
+            widget.set_mult(18);
         }
         else if (item == :min_60) {
-            widget.set_range(60);
+            widget.set_mult(24);
         }
         Ui.popView(Ui.SLIDE_RIGHT);
         return true;

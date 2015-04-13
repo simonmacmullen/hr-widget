@@ -1,4 +1,5 @@
 <menu id="PeriodMenu" title="Set Period">
+  <menu-item id="min_2">2 minutes</menu-item>
   <menu-item id="min_5">5 minutes</menu-item>
   <menu-item id="min_10">10 minutes</menu-item>
   <menu-item id="min_15">15 minutes</menu-item>
