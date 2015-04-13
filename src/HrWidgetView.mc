@@ -41,6 +41,7 @@ class HrWidgetView extends Ui.View {
     //! Restore the state of the app and prepare the view to be shown
     function onShow() {
         if (values == null) {
+            var app = App.getApp();
             var old_range_mult = app.getProperty(LAST_RANGE_MULT);
             if (old_range_mult != null) {
                 range_mult = old_range_mult;
@@ -49,7 +50,6 @@ class HrWidgetView extends Ui.View {
                 range_mult = 2;
             }
 
-            var app = App.getApp();
             var old_values = app.getProperty(LAST_VALUES);
             var old_time = app.getProperty(LAST_VALUE_TIME);
             if (old_values != null && old_time != null) {
