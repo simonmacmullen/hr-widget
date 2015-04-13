@@ -2,4 +2,5 @@
 DEVICE=$1
 [ "$DEVICE" = "" ] && DEVICE=fenix3
 
-monkeyc -o bin/HrWidget.prg -d $DEVICE -m manifest.xml -z resources/strings.xml:resources/bitmaps.xml:resources/menu/main.xml:resources/menu/period.xml src/HrWidget.mc
+RESOURCE_PATH=$(find . -path './resources*.xml' | xargs | tr ' ' ':')
+monkeyc -o bin/HrWidget.prg -d $DEVICE -m manifest.xml -z $RESOURCE_PATH src/*.mc
