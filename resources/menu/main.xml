@@ -1,3 +1,4 @@
 <menu id="MainMenu" title="Heart Widget">
   <menu-item id="set_period">Set Period</menu-item>
+  <menu-item id="swap_colors">Swap Colors</menu-item>
 </menu>

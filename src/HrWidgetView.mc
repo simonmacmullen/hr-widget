@@ -10,7 +10,8 @@ enum
 {
     LAST_VALUES,
     LAST_VALUE_TIME,
-    LAST_RANGE_MULT
+    RANGE_MULT,
+    INVERT
 }
 
 class HrWidgetView extends Ui.View {
@@ -19,6 +20,7 @@ class HrWidgetView extends Ui.View {
     var values;
     var range_mult;
     var range_mult_count = 0;
+    var invert = false;
     var chart;
 
     function set_mult(new_mult) {
@@ -32,6 +34,10 @@ class HrWidgetView extends Ui.View {
         return values;
     }
 
+    function toggle_colors() {
+        invert = !invert;
+    }
+
     //! Load your resources here
     function onLayout(dc) {
         chart = new Chart();
@@ -41,7 +47,7 @@ class HrWidgetView extends Ui.View {
     function onShow() {
         if (values == null) {
             var app = App.getApp();
-            var old_range_mult = app.getProperty(LAST_RANGE_MULT);
+            var old_range_mult = app.getProperty(RANGE_MULT);
             if (old_range_mult != null) {
                 range_mult = old_range_mult;
             }
@@ -63,6 +69,11 @@ class HrWidgetView extends Ui.View {
             else {
                 values = new[values_size];
             }
+
+            var old_invert = app.getProperty(INVERT);
+            if (old_invert != null) {
+                invert = old_invert;
+            }
         }
 
         Sensor.setEnabledSensors( [Sensor.SENSOR_HEARTRATE] );
@@ -75,14 +86,18 @@ class HrWidgetView extends Ui.View {
         var app = App.getApp();
         app.setProperty(LAST_VALUES, values);
         app.setProperty(LAST_VALUE_TIME, System.getTimer());
-        app.setProperty(LAST_RANGE_MULT, range_mult);
+        app.setProperty(RANGE_MULT, range_mult);
+        app.setProperty(INVERT, invert);
     }
 
     //! Update the view
     function onUpdate(dc) {
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+        var fg = invert ? Graphics.COLOR_BLACK : Graphics.COLOR_WHITE;
+        var bg = invert ? Graphics.COLOR_WHITE : Graphics.COLOR_BLACK;
+
+        dc.setColor(fg, bg);
         dc.clear();
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(fg, Graphics.COLOR_TRANSPARENT);
 
         var minutes_label = (values.size() * range_mult / 60) + " MINUTES";
 
@@ -92,15 +107,13 @@ class HrWidgetView extends Ui.View {
             text(dc, 109, 15, Graphics.FONT_TINY, "HEART");
             text(dc, 109, 45, Graphics.FONT_NUMBER_MEDIUM, str(current));
             text(dc, 109, 192, Graphics.FONT_XTINY, minutes_label);
-            chart.draw(dc, 23, 75, 195, 172,
-                       Graphics.COLOR_WHITE, Graphics.COLOR_RED, values);
+            chart.draw(dc, 23, 75, 195, 172, fg, Graphics.COLOR_RED, values);
         } else if (dc.getWidth() == 205 && dc.getHeight() == 148) {
             // Vivoactive, FR920xt, Epix
             text(dc, 70, 25, Graphics.FONT_MEDIUM, "HR");
             text(dc, 120, 25, Graphics.FONT_NUMBER_MEDIUM, str(current));
             text(dc, 102, 135, Graphics.FONT_XTINY, minutes_label);
-            chart.draw(dc, 10, 45, 195, 120,
-                       Graphics.COLOR_WHITE, Graphics.COLOR_RED, values);
+            chart.draw(dc, 10, 45, 195, 120, fg, Graphics.COLOR_RED, values);
         }
     }
 
@@ -145,6 +158,10 @@ class MenuDelegate extends Ui.MenuInputDelegate {
                         Ui.SLIDE_LEFT);
             return true;
         }
+        else if (item == :swap_colors) {
+            widget.toggle_colors();
+            return true;
+        } 
         Ui.popView(Ui.SLIDE_RIGHT);
         return true;
     }
