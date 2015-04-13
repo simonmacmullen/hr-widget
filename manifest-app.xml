@@ -1,0 +1,19 @@
+<iq:manifest xmlns:iq="http://www.garmin.com/xml/connectiq" version="1">
+    <iq:application entry="HrWidgetApp" id="157cb1358ea940a3b291b4fc9cd96f2a" launcherIcon="LauncherIcon" name="AppName" type="watch-app">
+
+        <iq:products>
+            <iq:product id="fenix3"/>
+            <iq:product id="vivoactive"/>
+            <iq:product id="fr920xt"/>
+            <iq:product id="epix"/>
+        </iq:products>
+
+        <iq:permissions>
+	  <iq:uses-permission id="Sensor"/>
+        </iq:permissions>
+
+        <iq:languages>
+        </iq:languages>
+
+    </iq:application>
+</iq:manifest>

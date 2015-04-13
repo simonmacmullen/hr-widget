@@ -1,7 +1,12 @@
 #!/bin/sh
+MODE=$1
+[ "$MODE" = "" ] && MODE=widget
+
+RESOURCE_PATH=$(find . -path './resources*.xml' | xargs | tr ' ' ':')
+
 monkeyc -e \
-    -o bin/HrWidget.iq \
+    -o bin/hr-$MODE.iq \
     -w \
-    -z resources/strings.xml:resources/bitmaps.xml \
-    -m manifest.xml \
-    src/HrWidget.mc
+    -z $RESOURCE_PATH \
+    -m manifest-$MODE.xml \
+    src/*.mc
