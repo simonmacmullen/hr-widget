@@ -12,6 +12,7 @@ class HrWidgetApp extends App.AppBase {
     }
 
     function getInitialView() {
-        return [new HrWidgetView(), new HrWidgetDelegate()];
+        widget = new HrWidgetView();
+        return [widget, new HrWidgetDelegate()];
     }
 }

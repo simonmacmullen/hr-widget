@@ -9,25 +9,24 @@ using Toybox.Application as App;
 enum
 {
     LAST_VALUES,
-    LAST_VALUE_TIME
+    LAST_VALUE_TIME,
+    LAST_RANGE_MULT
 }
 
 class HrWidgetView extends Ui.View {
     var current = null;
-    var values = new [120];
+    var values_size = 150;
+    var values;
+    var range_mult;
+    var range_mult_count = 0;
     var chart;
 
     function set_range(range) {
-        var size;
-        var new_values = new [range];
-        var delta = range - values.size();
-        for (var i = 0; i < values.size(); i++) {
-            var new_i = i + delta;
-            if (new_i >= 0 && new_i < new_values.size()) {
-                new_values[new_i] = values[i];
-            }
+        var new_range_mult = (range * 60) / values_size;
+        if (new_range_mult != range_mult) {
+            range_mult = new_range_mult;
+            values = new [values_size];
         }
-        values = new_values;
     }
 
     function get_values() {
@@ -41,16 +40,29 @@ class HrWidgetView extends Ui.View {
 
     //! Restore the state of the app and prepare the view to be shown
     function onShow() {
-        var app = App.getApp();
-        var old_values = app.getProperty(LAST_VALUES);
-        var old_time = app.getProperty(LAST_VALUE_TIME);
-        if (old_values != null && old_time != null) {
-            values = new[old_values.size()];
-            var delta = (System.getTimer() - old_time) / 1000;
-            if (delta > 0) { // Ignore old data from before reboot
-                for (var i = 0; i < values.size() - delta; i++) {
-                    values[i] = old_values[i + delta];
+        if (values == null) {
+            var old_range_mult = app.getProperty(LAST_RANGE_MULT);
+            if (old_range_mult != null) {
+                range_mult = old_range_mult;
+            }
+            else {
+                range_mult = 2;
+            }
+
+            var app = App.getApp();
+            var old_values = app.getProperty(LAST_VALUES);
+            var old_time = app.getProperty(LAST_VALUE_TIME);
+            if (old_values != null && old_time != null) {
+                values = new[values_size];
+                var delta = (System.getTimer() - old_time) / 1000 / range_mult;
+                if (delta > 0) { // Ignore old data from before reboot
+                    for (var i = 0; i < values.size() - delta; i++) {
+                        values[i] = old_values[i + delta];
+                    }
                 }
+            }
+            else {
+                values = new[values_size];
             }
         }
 
@@ -64,6 +76,7 @@ class HrWidgetView extends Ui.View {
         var app = App.getApp();
         app.setProperty(LAST_VALUES, values);
         app.setProperty(LAST_VALUE_TIME, System.getTimer());
+        app.setProperty(LAST_RANGE_MULT, range_mult);
     }
 
     //! Update the view
@@ -72,7 +85,7 @@ class HrWidgetView extends Ui.View {
         dc.clear();
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
 
-        var minutes_label = (values.size() / 60) + " MINUTES";
+        var minutes_label = (values.size() * range_mult / 60) + " MINUTES";
 
         // TODO this is maybe just a tiny bit too ad-hoc
         if (dc.getWidth() == 218 && dc.getHeight() == 218) {
@@ -109,10 +122,14 @@ class HrWidgetView extends Ui.View {
 
     function onSensor(sensorInfo) {
         current = sensorInfo.heartRate;
-        for (var i = 1; i < values.size(); i++) {
-            values[i-1] = values[i];
+        range_mult_count++;
+        if (range_mult_count >= range_mult) {
+            for (var i = 1; i < values.size(); i++) {
+                values[i-1] = values[i];
+            }
+            values[values.size() - 1] = current;
+            range_mult_count = 0;
         }
-        values[values.size() - 1] = current;
         Ui.requestUpdate();
     }
 }
@@ -142,17 +159,23 @@ class MenuDelegate extends Ui.MenuInputDelegate {
 
 class PeriodMenuDelegate extends Ui.MenuInputDelegate {
     function onMenuItem(item) {
-        if (item == :min_2) {
-            widget.set_range(120);
-        }
-        else if (item == :min_5) {
-            widget.set_range(300);
+        if (item == :min_5) {
+            widget.set_range(5);
         }
         else if (item == :min_10) {
-            widget.set_range(600);
+            widget.set_range(10);
         }
         else if (item == :min_15) {
-            widget.set_range(900);
+            widget.set_range(15);
+        }
+        else if (item == :min_30) {
+            widget.set_range(30);
+        }
+        else if (item == :min_45) {
+            widget.set_range(45);
+        }
+        else if (item == :min_60) {
+            widget.set_range(60);
         }
         Ui.popView(Ui.SLIDE_RIGHT);
         return true;
