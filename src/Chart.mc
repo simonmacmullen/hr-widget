@@ -37,18 +37,28 @@ class Chart {
             range_max = range_min + range_min_size;
         }
 
-        for (var i = 0; i < data.size(); i++) {
-            item = data[i];
-            x_next = item_x(i + 1, x1, width, data.size());
+        var x_old = null;
+        var y_old = null;
+        for (var x = x1; x <= x2; x++) {
+            item = data[x_item(x, x1, width, data.size())];
             if (item != null) {
                 var y = item_y(item, y2, height, range_min, range_max);
                 dc.setColor(block_color, Graphics.COLOR_TRANSPARENT);
-                dc.fillRectangle(x, y, x_next - x, y2 - y);
-                dc.setColor(line_color, Graphics.COLOR_TRANSPARENT);
-                dc.drawLine(x, y, x_next, y);
+                dc.drawLine(x, y, x, y2);
+                if (x_old != null) {
+                    dc.setColor(line_color, Graphics.COLOR_TRANSPARENT);
+                    dc.drawLine(x_old, y_old, x, y);
+                }
+                x_old = x;
+                y_old = y;
             }
-            x = x_next;
+            else {
+                x_old = null;
+                y_old = null;
+            }
         }
+
+        dc.setColor(line_color, Graphics.COLOR_TRANSPARENT);
 
         if (max != 0 and min != max) {
             label_text(dc, item_x(min_i, x1, width, data.size()),
@@ -65,7 +75,11 @@ class Chart {
     }
 
     function item_x(i, orig_x, width, size) {
-        return orig_x + i * width / size;
+        return orig_x + i * width / (size - 1);
+    }
+
+    function x_item(x, orig_x, width, size) {
+        return (x - orig_x) * (size - 1) / width;
     }
 
     function item_y(item, orig_y, height, min, max) {
