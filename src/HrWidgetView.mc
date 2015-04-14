@@ -83,6 +83,11 @@ class HrWidgetView extends Ui.View {
     //! Called when this View is removed from the screen. Save the
     //! state of your app here.
     function onHide() {
+        // Write here for the widget case
+        write_data();
+    }
+
+    function write_data() {
         var app = App.getApp();
         app.setProperty(LAST_VALUES, values);
         app.setProperty(LAST_VALUE_TIME, System.getTimer());
