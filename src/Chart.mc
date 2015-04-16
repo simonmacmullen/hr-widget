@@ -1,7 +1,15 @@
 // -*- mode: Javascript;-*-
 
 class Chart {
-    function draw(dc, x1, y1, x2, y2, line_color, block_color, data) {
+    var model;
+
+    function initialize(a_model) {
+        model = a_model;
+    }
+
+    function draw(dc, x1, y1, x2, y2, line_color, block_color) {
+        var data = model.get_values();
+
         var range_border = 5;
         var range_min_size = 30;
 

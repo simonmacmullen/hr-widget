@@ -2,19 +2,28 @@
 
 using Toybox.Application as App;
 
-var widget;
+var view;
+var model;
+
+enum
+{
+    LAST_VALUES,
+    LAST_VALUE_TIME,
+    RANGE_MULT,
+    INVERT
+}
 
 class HrWidgetApp extends App.AppBase {
     function onStart() {
-        widget = new HrWidgetView();
+        view = new HrWidgetView();
     }
 
     function onStop() {
         // Write here for the app case
-        widget.write_data();
+        model.write_data();
     }
 
     function getInitialView() {
-        return [widget, new HrWidgetDelegate()];
+        return [view, new HrWidgetDelegate()];
     }
 }
