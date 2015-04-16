@@ -7,7 +7,9 @@ class Chart {
         model = a_model;
     }
 
-    function draw(dc, x1, y1, x2, y2, line_color, block_color) {
+    function draw(dc, x1, y1, x2, y2,
+                  line_color, block_color, min_max_color,
+                  draw_axes) {
         var data = model.get_values();
 
         var range_border = 5;
@@ -69,9 +71,8 @@ class Chart {
             }
         }
 
-        dc.setColor(line_color, Graphics.COLOR_TRANSPARENT);
-
         if (max != 0 and min != max) {
+            dc.setColor(min_max_color, Graphics.COLOR_TRANSPARENT);
             label_text(dc, item_x(min_i, x1, width, data.size()),
                        item_y(min, y2, height, range_min, range_max),
                        x1, y1, x2, y2, "" + min, false);
@@ -80,9 +81,12 @@ class Chart {
                        x1, y1, x2, y2, "" + max, true);
         }
 
-        tick_line(dc, x1, y1, y2, -5, true);
-        tick_line(dc, x2, y1, y2, 5, true);
-        tick_line(dc, y2, x1, x2 + 1, 5, false);
+        if (draw_axes) {
+            dc.setColor(line_color, Graphics.COLOR_TRANSPARENT);
+            tick_line(dc, x1, y1, y2, -5, true);
+            tick_line(dc, x2, y1, y2, 5, true);
+            tick_line(dc, y2, x1, x2 + 1, 5, false);
+        }
     }
 
     function item_x(i, orig_x, width, size) {

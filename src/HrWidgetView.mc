@@ -63,13 +63,13 @@ class HrWidgetView extends Ui.View {
             text(dc, 109, 15, Graphics.FONT_TINY, "HEART");
             text(dc, 109, 45, Graphics.FONT_NUMBER_MEDIUM, model.get_current_str());
             text(dc, 109, 192, Graphics.FONT_XTINY, minutes_label);
-            chart.draw(dc, 23, 75, 195, 172, fg, Graphics.COLOR_RED);
+            chart.draw(dc, 23, 75, 195, 172, fg, Graphics.COLOR_RED, fg, true);
         } else if (dc.getWidth() == 205 && dc.getHeight() == 148) {
             // Vivoactive, FR920xt, Epix
             text(dc, 70, 25, Graphics.FONT_MEDIUM, "HR");
             text(dc, 120, 25, Graphics.FONT_NUMBER_MEDIUM, model.get_current_str());
             text(dc, 102, 135, Graphics.FONT_XTINY, minutes_label);
-            chart.draw(dc, 10, 45, 195, 120, fg, Graphics.COLOR_RED);
+            chart.draw(dc, 10, 45, 195, 120, fg, Graphics.COLOR_RED, fg, true);
         }
     }
 

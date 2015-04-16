@@ -10,6 +10,10 @@ class ChartModel {
     var range_mult;
     var range_mult_count = 0;
 
+    function initialize() {
+        set_mult(1);
+    }
+
     function set_mult(new_mult) {
         if (new_mult != range_mult) {
             range_mult = new_mult;
