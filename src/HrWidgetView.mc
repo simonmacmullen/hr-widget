@@ -21,7 +21,7 @@ class HrWidgetView extends Ui.View {
     //! Restore the state of the app and prepare the view to be shown
     function onShow() {
         if (model == null) {
-            model = new ChartModel();
+            model = new PersistentChartModel();
             model.read_data();
 
             chart = new Chart(model);
@@ -61,15 +61,28 @@ class HrWidgetView extends Ui.View {
         if (dc.getWidth() == 218 && dc.getHeight() == 218) {
             // Fenix 3
             text(dc, 109, 15, Graphics.FONT_TINY, "HEART");
-            text(dc, 109, 45, Graphics.FONT_NUMBER_MEDIUM, model.get_current_str());
+            text(dc, 109, 45, Graphics.FONT_NUMBER_MEDIUM,
+                 fmt_num(model.get_current()));
             text(dc, 109, 192, Graphics.FONT_XTINY, minutes_label);
-            chart.draw(dc, 23, 75, 195, 172, fg, Graphics.COLOR_RED, fg, true);
+            chart.draw(dc, [23, 75, 195, 172], fg, Graphics.COLOR_RED,
+                       30, true, true, self);
         } else if (dc.getWidth() == 205 && dc.getHeight() == 148) {
             // Vivoactive, FR920xt, Epix
             text(dc, 70, 25, Graphics.FONT_MEDIUM, "HR");
-            text(dc, 120, 25, Graphics.FONT_NUMBER_MEDIUM, model.get_current_str());
+            text(dc, 120, 25, Graphics.FONT_NUMBER_MEDIUM,
+                 fmt_num(model.get_current()));
             text(dc, 102, 135, Graphics.FONT_XTINY, minutes_label);
-            chart.draw(dc, 10, 45, 195, 120, fg, Graphics.COLOR_RED, fg, true);
+            chart.draw(dc, [10, 45, 195, 120], fg, Graphics.COLOR_RED,
+                       30, true, true, self);
+        }
+    }
+
+    function fmt_num(num) {
+        if (num == null) {
+            return "---";
+        }
+        else {
+            return "" + num;
         }
     }
 
