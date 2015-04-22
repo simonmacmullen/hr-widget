@@ -59,10 +59,10 @@ class HrWidgetView extends Ui.View {
 
         var duration_label;
         if (model.get_range_minutes() < 60) {
-            duration_label = model.get_range_minutes() + " MINUTES";
+            duration_label = model.get_range_minutes().toNumber() + " MINUTES";
         }
         else {
-            duration_label = (model.get_range_minutes() / 60) + " HOURS";
+            duration_label = (model.get_range_minutes() / 60).toNumber() + " HOURS";
         }
 
         // TODO this is maybe just a tiny bit too ad-hoc
