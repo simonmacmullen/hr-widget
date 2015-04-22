@@ -5,10 +5,12 @@ using Toybox.Sensor as Sensor;
 using Toybox.System as System;
 using Toybox.WatchUi as Ui;
 using Toybox.Application as App;
+using Toybox.Attention as Attention;
 
 class HrWidgetView extends Ui.View {
     var invert = false;
     var chart;
+    var have_connected = false;
 
     function toggle_colors() {
         invert = !invert;
@@ -91,7 +93,20 @@ class HrWidgetView extends Ui.View {
                     Graphics.TEXT_JUSTIFY_CENTER|Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
+    var vibrateData = [new Attention.VibeProfile( 25, 100),
+                       new Attention.VibeProfile( 50, 100),
+                       new Attention.VibeProfile( 75, 100),
+                       new Attention.VibeProfile(100, 100),
+                       new Attention.VibeProfile( 75, 100),
+                       new Attention.VibeProfile( 50, 100),
+                       new Attention.VibeProfile( 25, 100)];
+
     function onSensor(sensorInfo) {
+        if (sensorInfo.heartRate != null && !have_connected) {
+            Attention.playTone(Attention.TONE_START);
+            Attention.vibrate(vibrateData);
+            have_connected = true;
+        }
         model.new_value(sensorInfo.heartRate);
         Ui.requestUpdate();
     }
@@ -144,8 +159,8 @@ class PeriodMenuDelegate extends Ui.MenuInputDelegate {
         else if (item == :min_45) {
             model.set_mult(18);
         }
-        else if (item == :min_60) {
-            model.set_mult(24);
+        else if (item == :hour_24) {
+            model.set_range_minutes(1440);
         }
         Ui.popView(Ui.SLIDE_RIGHT);
         return true;
