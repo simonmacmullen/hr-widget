@@ -57,7 +57,13 @@ class HrWidgetView extends Ui.View {
         dc.clear();
         dc.setColor(fg, Graphics.COLOR_TRANSPARENT);
 
-        var minutes_label = model.get_range_minutes() + " MINUTES";
+        var duration_label;
+        if (model.get_range_minutes() < 60) {
+            duration_label = model.get_range_minutes() + " MINUTES";
+        }
+        else {
+            duration_label = (model.get_range_minutes() / 60) + " HOURS";
+        }
 
         // TODO this is maybe just a tiny bit too ad-hoc
         if (dc.getWidth() == 218 && dc.getHeight() == 218) {
@@ -65,7 +71,7 @@ class HrWidgetView extends Ui.View {
             text(dc, 109, 15, Graphics.FONT_TINY, "HEART");
             text(dc, 109, 45, Graphics.FONT_NUMBER_MEDIUM,
                  fmt_num(model.get_current()));
-            text(dc, 109, 192, Graphics.FONT_XTINY, minutes_label);
+            text(dc, 109, 192, Graphics.FONT_XTINY, duration_label);
             chart.draw(dc, [23, 75, 195, 172], fg, Graphics.COLOR_RED,
                        30, true, true, false, self);
         } else if (dc.getWidth() == 205 && dc.getHeight() == 148) {
@@ -73,7 +79,7 @@ class HrWidgetView extends Ui.View {
             text(dc, 70, 25, Graphics.FONT_MEDIUM, "HR");
             text(dc, 120, 25, Graphics.FONT_NUMBER_MEDIUM,
                  fmt_num(model.get_current()));
-            text(dc, 102, 135, Graphics.FONT_XTINY, minutes_label);
+            text(dc, 102, 135, Graphics.FONT_XTINY, duration_label);
             chart.draw(dc, [10, 45, 195, 120], fg, Graphics.COLOR_RED,
                        30, true, true, false, self);
         }
@@ -142,22 +148,31 @@ class MenuDelegate extends Ui.MenuInputDelegate {
 class PeriodMenuDelegate extends Ui.MenuInputDelegate {
     function onMenuItem(item) {
         if (item == :min_2) {
-            model.set_mult(1);
+            model.set_range_minutes(2.5);
         }
         else if (item == :min_5) {
-            model.set_mult(2);
+            model.set_range_minutes(5);
         }
         else if (item == :min_10) {
-            model.set_mult(4);
+            model.set_range_minutes(10);
         }
         else if (item == :min_15) {
-            model.set_mult(6);
+            model.set_range_minutes(15);
         }
         else if (item == :min_30) {
-            model.set_mult(12);
+            model.set_range_minutes(30);
         }
         else if (item == :min_45) {
-            model.set_mult(18);
+            model.set_range_minutes(45);
+        }
+        else if (item == :hour_1) {
+            model.set_range_minutes(60);
+        }
+        else if (item == :hour_2) {
+            model.set_range_minutes(120);
+        }
+        else if (item == :hour_8) {
+            model.set_range_minutes(480);
         }
         else if (item == :hour_24) {
             model.set_range_minutes(1440);

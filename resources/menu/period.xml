@@ -5,5 +5,8 @@
   <menu-item id="min_15">15 minutes</menu-item>
   <menu-item id="min_30">30 minutes</menu-item>
   <menu-item id="min_45">45 minutes</menu-item>
-  <menu-item id="min_60">60 minutes</menu-item>
+  <menu-item id="hour_1">1 hour</menu-item>
+  <menu-item id="hour_2">2 hours</menu-item>
+  <menu-item id="hour_8">8 hours</menu-item>
+  <menu-item id="hour_24">24 hours</menu-item>
 </menu>
