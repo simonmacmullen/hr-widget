@@ -9,7 +9,8 @@ class Chart {
 
     function draw(dc, x1y1x2y2,
                   line_color, block_color,
-                  range_min_size, draw_min_max, draw_axes, formatter) {
+                  range_min_size, draw_min_max, draw_axes,
+                  strict_min_max_bounding, formatter) {
         // Work around 10 arg limit!
         var x1 = x1y1x2y2[0];
         var y1 = x1y1x2y2[1];
@@ -61,12 +62,16 @@ class Chart {
 
         if (draw_min_max and model.get_min_max_interesting()) {
             dc.setColor(line_color, Graphics.COLOR_TRANSPARENT);
+            var bg_color = line_color == Graphics.COLOR_WHITE
+                ? Graphics.COLOR_BLACK : Graphics.COLOR_WHITE;
             label_text(dc, item_x(model.get_min_i(), x1, width, data.size()),
                        item_y(min, y2, height, range_min, range_max),
-                       x1, y1, x2, y2, formatter.fmt_num(min), false);
+                       x1y1x2y2, line_color, bg_color, formatter.fmt_num(min),
+                       strict_min_max_bounding, false);
             label_text(dc, item_x(model.get_max_i(), x1, width, data.size()),
                        item_y(max, y2, height, range_min, range_max),
-                       x1, y1, x2, y2, formatter.fmt_num(max), true);
+                       x1y1x2y2, line_color, bg_color, formatter.fmt_num(max),
+                       strict_min_max_bounding, true);
         }
 
         if (draw_axes) {
@@ -89,9 +94,16 @@ class Chart {
         return orig_y - height * (item - min) / (max - min);
     }
 
-    function label_text(dc, x, y, x1, y1, x2, y2, txt, above) {
+    function label_text(dc, x, y, x1y1x2y2, fg, bg, txt, strict, above) {
+        var x1 = x1y1x2y2[0];
+        var y1 = x1y1x2y2[1];
+        var x2 = x1y1x2y2[2];
+        var y2 = x1y1x2y2[3];
+
         var dims = dc.getTextDimensions(txt, Graphics.FONT_XTINY);
         var w = dims[0];
+        var h = dims[1];
+
         x -= w / 2;
         if (x < x1 + 2) {
             x = x1 + 2;
@@ -99,10 +111,27 @@ class Chart {
             x = x2 - w - 2;
         }
         if (above) {
-            var h = dims[1];
             y -= h;
         }
-        dc.drawText(x, y, Graphics.FONT_XTINY, txt, Graphics.TEXT_JUSTIFY_LEFT);
+        if (strict) {
+            if (y > y2 - h) {
+                y = y2 - h;
+            }
+            else if (y < y1) {
+                y = y1;
+            }
+        }
+        text_outline(dc, x, y, fg, bg, Graphics.FONT_XTINY, txt);
+    }
+
+    function text_outline(dc, x, y, fg, bg, font, s) {
+        dc.setColor(bg, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(x-2, y, font, s, Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(x+2, y, font, s, Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(x, y-2, font, s, Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(x, y+2, font, s, Graphics.TEXT_JUSTIFY_LEFT);
+        dc.setColor(fg, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(x, y, font, s, Graphics.TEXT_JUSTIFY_LEFT);
     }
 
     function tick_line(dc, c, end1, end2, tick_size, vert) {
