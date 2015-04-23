@@ -29,9 +29,8 @@ class HrWidgetView extends Ui.View {
             chart = new Chart(model);
 
             var app = App.getApp();
-            var old_invert = app.getProperty(INVERT);
-            if (old_invert != null) {
-                invert = old_invert;
+            if (app.getProperty(INVERT) == true) {
+                invert = true;
             }
         }
 
