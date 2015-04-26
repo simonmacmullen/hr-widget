@@ -108,7 +108,9 @@ class HrWidgetView extends Ui.View {
 
     function onSensor(sensorInfo) {
         if (sensorInfo.heartRate != null && !have_connected) {
-            Attention.playTone(Attention.TONE_START);
+            if (Attention has :playTone) {
+                Attention.playTone(Attention.TONE_START);
+            }
             Attention.vibrate(vibrateData);
             have_connected = true;
         }
